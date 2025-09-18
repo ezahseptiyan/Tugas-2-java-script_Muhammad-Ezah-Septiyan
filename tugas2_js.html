@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Pegawai</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2>Data Pegawai</h2>
+    <table id="pegawaiTable">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama Pegawai</th>
+                <th>Umur</th>
+                <th>Jabatan</th>
+                <th>Status</th>
+                <th>Gaji Pokok</th>
+                <th>Tunjangan Jabatan</th>
+                <th>BPJS</th>
+                <th>Tunjangan Keluarga</th>
+                <th>Total Gaji</th>
+                <th>Aksi</th> <!-- Kolom aksi -->
+            </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
+    </table>
+
+    <h3>Tambah Pegawai Baru</h3>
+    <form id="formPegawai">
+        <input type="text" id="nama" placeholder="Nama" required>
+        <input type="number" id="umur" placeholder="Umur" required>
+        <select id="jabatan" required>
+            <option value="">--Pilih Jabatan--</option>
+            <option value="Manajer">Manajer</option>
+            <option value="Asisten Manajer">Asisten Manajer</option>
+            <option value="Staff">Staff</option>
+        </select>
+        <select id="status" required>
+            <option value="">--Pilih Status--</option>
+            <option value="Menikah">Menikah</option>
+            <option value="Belum Menikah">Belum Menikah</option>
+        </select>
+        <button type="submit">Tambah Pegawai</button>
+    </form>
+
+    <script>
+        let pegawaiList = [
+            {nama: "Dodi Prayodi", umur: 25, jabatan: "Manajer", status: "Menikah"}
+        ];
+
+        let tbody = document.querySelector("#pegawaiTable tbody");
+        let tfoot = document.querySelector("#pegawaiTable tfoot");
+        let form = document.getElementById("formPegawai");
+
+        function hitungGapok(jabatan) {
+            if (jabatan === "Manajer") return 15000000;
+            else if (jabatan === "Asisten Manajer") return 10000000;
+            else return 5000000;
+        }
+
+        function renderTable() {
+            let htmlTbody = "";
+            let totalGajiSemua = 0;
+
+            for (let i = 0; i < pegawaiList.length; i++) {
+                let peg = pegawaiList[i];
+                let gapok = hitungGapok(peg.jabatan);
+                let tunjanganJabatan = gapok * 0.15;
+                let bpjs = gapok * 0.10;
+                let tunjanganKeluarga = (peg.status.toLowerCase() === "menikah") ? gapok * 0.20 : 0;
+                let totalGaji = gapok + tunjanganJabatan + bpjs + tunjanganKeluarga;
+                totalGajiSemua += totalGaji;
+
+                htmlTbody += "<tr>" +
+                    "<td>" + (i+1) + "</td>" +
+                    "<td>" + peg.nama + "</td>" +
+                    "<td>" + peg.umur + "</td>" +
+                    "<td>" + peg.jabatan + "</td>" +
+                    "<td>" + peg.status + "</td>" +
+                    "<td>Rp " + gapok + "</td>" +
+                    "<td>Rp " + tunjanganJabatan + "</td>" +
+                    "<td>Rp " + bpjs + "</td>" +
+                    "<td>Rp " + tunjanganKeluarga + "</td>" +
+                    "<td>Rp " + totalGaji + "</td>" +
+                    `<td><button onclick="hapusPegawai(${i})" class="hapus-btn">Hapus</button></td>` +
+                "</tr>";
+            }
+
+            tbody.innerHTML = htmlTbody;
+            tfoot.innerHTML = "<tr>" +
+                "<td colspan='10'>Total Gaji Semua Pegawai</td>" +
+                "<td>Rp " + totalGajiSemua + "</td>" +
+            "</tr>";
+        }
+
+        function hapusPegawai(index) {
+            if (confirm("Apakah Anda yakin ingin menghapus pegawai ini?")) {
+                pegawaiList.splice(index, 1); // Hapus data
+                renderTable(); // Render ulang tabel
+            }
+        }
+
+        renderTable();
+
+        form.addEventListener("submit", function(e) {
+            e.preventDefault();
+            let nama = document.getElementById("nama").value;
+            let umur = parseInt(document.getElementById("umur").value);
+            let jabatan = document.getElementById("jabatan").value;
+            let status = document.getElementById("status").value;
+
+            pegawaiList.push({nama: nama, umur: umur, jabatan: jabatan, status: status});
+            form.reset();
+            renderTable();
+        });
+    </script>
+</body>
+</html>
